@@ -9,6 +9,12 @@ We will also use 3rd-party libraries as we continue our learning.  We will link 
 We may also, tweak or edit, third-party libraries (and these derivatives will go in our tweaked folders).  
 We will also link any algorithms we create here.
 
+## Algorithms
+* [Shader4GL](src/APPLICATION/Algorithms/Shader4GL/) - Convenience for Loading a Shader Program.  Handles debug and de-allocating individual shaders.
+
+## Useful Quotes
+* LearnOpenGL: Sending data to the graphics card from the CPU is relatively slow, so wherever we can we try to send as much data as possible at once. 
+
 ## Building
 * This project is built for linux (unix).  If you are using windows you will have to research on your own how to build it.
 * We generate a makefile (using an internal tool).  All you need to do is run make. If you using something other than make (do your own research).
@@ -21,11 +27,8 @@ We will also link any algorithms we create here.
 This project is licensed under the zlib license - see the [LICENSE](LICENSE) file for details.
 © All rights reserved.
 
-## Version
-The current version of this project can be seen on the [VERSION](VERSION.md) file.
-
 ## Project Managers
-* Innovative Director:		Alrick Grandison
+* Lead:		Alrick Grandison
 
 
 ## Authors

@@ -40,9 +40,6 @@ WIDTH  = 800,
 HEIGHT = 600
 };
 
-// SHADER
-unsigned int SHADER = 0;
-
 static void createTriangle();
 static void drawTriangle();
 static void destroyTriangle();
@@ -62,7 +59,7 @@ int main(int argc, char * argv[]) {
 
 	// Create an application window with the following settings:
 	WINDOW = SDL_CreateWindow (
-		"App™",                  // window title
+		"SDL - OpenGL App",                  // window title
 		SDL_WINDOWPOS_UNDEFINED,           // initial x position
 		SDL_WINDOWPOS_UNDEFINED,           // initial y position
 		WIDTH,              // width, in pixels
@@ -148,7 +145,7 @@ static float triangleVertices[] = {
 
 static void createTriangle () {
 	// load shader
-	triangleShader = Shader4GL_CreateFromFile("data/basic.vert", "data/basic.frag");
+	triangleShader = Shader4GL_NewFromFile("data/basic.vert", "data/basic.frag");
 	
 	glGenVertexArrays(1, &triangleVAO);
 	glGenBuffers(1, &triangleVBO);
@@ -165,6 +162,7 @@ static void createTriangle () {
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 	
+	SDL_Log("Created Triangle");
 }
 
 static void drawTriangle() {
@@ -176,6 +174,9 @@ static void drawTriangle() {
 static void destroyTriangle() {
 	glDeleteVertexArrays(1, &triangleVAO);
     	glDeleteBuffers(1, &triangleVBO);
+    	Shader4GL_Delete(&triangleShader);
+    	
+    	SDL_Log("Destroyed Triangle");
 }
 
 

@@ -29,13 +29,13 @@
 
 static void runCompileErrors(unsigned int shader, const char * type);
 
-Shader4GL_t Shader4GL_CreateFromFile(const char * vertf, const char * fragf) {
+Shader4GL_t Shader4GL_NewFromFile(const char * vertf, const char * fragf) {
 	Shader4GL_t shader;
 	Shader4GL_LoadFile(&shader, vertf, fragf);
 	return shader;
 }
 
-Shader4GL_t Shader4GL_CreateFromMemory(const char * vert, const char * frag) {
+Shader4GL_t Shader4GL_NewFromMemory(const char * vert, const char * frag) {
 	Shader4GL_t shader;
 	Shader4GL_LoadMemory(&shader, vert, frag);
 	return shader;

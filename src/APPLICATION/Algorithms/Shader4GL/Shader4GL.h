@@ -30,8 +30,8 @@ typedef struct {
 	unsigned int id;
 } Shader4GL_t;
 
-Shader4GL_t Shader4GL_CreateFromFile(const char * vertf, const char * fragf);
-Shader4GL_t Shader4GL_CreateFromMemory(const char * vert, const char * frag);
+Shader4GL_t Shader4GL_NewFromFile(const char * vertf, const char * fragf);
+Shader4GL_t Shader4GL_NewFromMemory(const char * vert, const char * frag);
 void Shader4GL_LoadFile(Shader4GL_t * this, const char * vertf, const char * fragf);
 void Shader4GL_LoadMemory(Shader4GL_t * this, const char * vert, const char * frag);
 void Shader4GL_Delete(Shader4GL_t * this);
