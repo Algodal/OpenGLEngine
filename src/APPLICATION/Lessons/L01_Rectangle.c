@@ -11,10 +11,10 @@
 //  3. This notice may not be removed or altered from any source distribution.                                                          //
 //                                                                                                                                      //
 //                                                                                                                                      //
-//  filename: L01_Triangle.c                                                                                                            //
-//  created: 2022-06-05 11:33 PM                                                                                                        //
+//  filename: L01_Rectangle.c                                                                                                           //
+//  created: 2022-06-06 11:15 PM                                                                                                        //
 //                                                                                                                                      //
-//  description: Draw A Simple Triangle                                                                                                 //
+//  description: Rectangle and EBO                                                                                                      //
 //                                                                                                                                      //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -26,6 +26,7 @@
 #include "glad.h"
 
 #include "Shader4GL.h"
+
 
 // SDL
 static SDL_Window * WINDOW = 0;
@@ -40,9 +41,9 @@ WIDTH  = 800,
 HEIGHT = 600
 };
 
-static void createTriangle();
-static void drawTriangle();
-static void destroyTriangle();
+static void createRectangle();
+static void drawRectangle();
+static void destroyRectangle();
 
 int main(int argc, char * argv[]) {
 	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ) {
@@ -96,14 +97,14 @@ int main(int argc, char * argv[]) {
 	// START THE GAME
 	RUNNING = 1;
 	SDL_Event event;
-	createTriangle();
+	createRectangle();
 	
 	// GAME LOOP
 	while ( RUNNING ) {
 		glClearColor(0.2f, 0.2f, 0.6f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		
-		drawTriangle();
+		drawRectangle();
 		
 		SDL_GL_SwapWindow( WINDOW );
 		
@@ -115,7 +116,7 @@ int main(int argc, char * argv[]) {
 	}
 
 	// DESTROY
-	destroyTriangle();
+	destroyRectangle();
 	
 	SDL_DestroyWindow ( WINDOW );
 	SDL_Log("Destroyed Window");
@@ -132,52 +133,62 @@ int main(int argc, char * argv[]) {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /////   TRIANGLE
 
-static Shader4GL_t triangleShader;
-static unsigned int triangleVAO;
-static unsigned int triangleVBO;
+static Shader4GL_t rectangleShader;
+static unsigned int rectangleVAO;
+static unsigned int rectangleVBO;
+static unsigned int rectangleEBO;
 
-static float triangleVertices[] = {
-	// positions         // colors
-	 0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // bottom right
-	-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
-	 0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f   // top 
+static float rectangleVertices[] = {
+	0.5f,  0.5f, 0.0f,  // top right
+	0.5f, -0.5f, 0.0f,  // bottom right
+	-0.5f, -0.5f, 0.0f,  // bottom left
+	-0.5f,  0.5f, 0.0f   // top left 
 };
 
-static void createTriangle () {
-	// load shader
-	triangleShader = Shader4GL_NewFromFile("data/color.vert", "data/color.frag");
-	
-	glGenVertexArrays(1, &triangleVAO);
-	glGenBuffers(1, &triangleVBO);
-	// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-	glBindVertexArray(triangleVAO);
+unsigned int rectangleIndices[] = {  // note that we start from 0!
+    0, 1, 3,   // first triangle
+    1, 2, 3    // second triangle
+};  
 
-	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
+static void createRectangle () {
+	// load shader
+	rectangleShader = Shader4GL_NewFromFile("data/basic.vert", "data/basic.frag");
+	
+	glGenVertexArrays(1, &rectangleVAO);
+	glGenBuffers(1, &rectangleVBO);
+	glGenBuffers(1, &rectangleEBO);
+	// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+	glBindVertexArray(rectangleVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, rectangleVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(rectangleVertices), rectangleVertices, GL_STATIC_DRAW);
 
 	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
 	
-	SDL_Log("Created Triangle");
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rectangleEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rectangleIndices), rectangleIndices, GL_STATIC_DRAW); 
+	
+	SDL_Log("Created Rectangle");
 }
 
-static void drawTriangle() {
-	Shader4GL_Use(&triangleShader);
-	glBindVertexArray(triangleVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+static void drawRectangle() {
+	Shader4GL_Use(&rectangleShader);
+	glBindVertexArray(rectangleVAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-static void destroyTriangle() {
-	glDeleteVertexArrays(1, &triangleVAO);
-    	glDeleteBuffers(1, &triangleVBO);
-    	Shader4GL_Delete(&triangleShader);
+static void destroyRectangle() {
+	glDeleteVertexArrays(1, &rectangleVAO);
+    	glDeleteBuffers(1, &rectangleVBO);
+    	Shader4GL_Delete(&rectangleShader);
     	
-    	SDL_Log("Destroyed Triangle");
+    	SDL_Log("Destroyed Rectangle");
 }
+
+
+
 
 
 

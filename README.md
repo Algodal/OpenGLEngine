@@ -3,11 +3,17 @@ This is a learning development exercise to become familiar with OpenGL.  The sec
 
 This project is for 2 main purposes as said before:
 * Learn OpenGL
-* Build Algorithms to make it easier to use OpenGL
+* Build Algorithms to make it easier to use OpenGL.  Algorithms may be dependent on either (or both) OpenGL and SDL.
 
 We will also use 3rd-party libraries as we continue our learning.  We will link them here as we learn them.
 We may also, tweak or edit, third-party libraries (and these derivatives will go in our tweaked folders).  
 We will also link any algorithms we create here.
+
+## Dependencies
+* OpenGL (of course).  After you master OpenGL, give its child, [Vulcan](http://vulkan-tutorial.com/) a try!
+* SDL (Our Windowing Framework (My preferred :smile:)  Other alternatives: GFLW
+* GLAD (loading OpenGL functions, required! An alternative would be GLEW)
+* SDL_Image (for loading image, but you can use any image loading library of choice, it really doesn't matter)
 
 ## Algorithms
 * [Shader4GL](src/APPLICATION/Algorithms/Shader4GL/) - Convenience for Loading a Shader Program.  Handles debug and de-allocating individual shaders.

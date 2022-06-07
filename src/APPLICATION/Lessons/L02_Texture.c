@@ -11,10 +11,10 @@
 //  3. This notice may not be removed or altered from any source distribution.                                                          //
 //                                                                                                                                      //
 //                                                                                                                                      //
-//  filename: L01_Triangle.c                                                                                                            //
-//  created: 2022-06-05 11:33 PM                                                                                                        //
+//  filename: L02_Texture.c                                                                                                             //
+//  created: 2022-06-07 12:57 AM                                                                                                        //
 //                                                                                                                                      //
-//  description: Draw A Simple Triangle                                                                                                 //
+//  description: Texture for OpenGL                                                                                                     //
 //                                                                                                                                      //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -23,9 +23,11 @@
 #include <string.h>
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include "glad.h"
 
 #include "Shader4GL.h"
+
 
 // SDL
 static SDL_Window * WINDOW = 0;
@@ -40,9 +42,9 @@ WIDTH  = 800,
 HEIGHT = 600
 };
 
-static void createTriangle();
-static void drawTriangle();
-static void destroyTriangle();
+static void createTexture();
+static void drawTexture();
+static void destroyTexture();
 
 int main(int argc, char * argv[]) {
 	if ( SDL_Init(SDL_INIT_VIDEO) != 0 ) {
@@ -85,6 +87,11 @@ int main(int argc, char * argv[]) {
 		SDL_Log( "Failed to initialize GLAD! SDL Error: %s\n", SDL_GetError() );
 		return EXIT_FAILURE;
 	}
+	
+	if( !( IMG_Init( IMG_INIT_PNG ) & IMG_INIT_PNG ) ) {
+		SDL_Log( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
+		return EXIT_FAILURE;
+	}
 
 	glViewport(0, 0, WIDTH, HEIGHT);
 
@@ -96,14 +103,14 @@ int main(int argc, char * argv[]) {
 	// START THE GAME
 	RUNNING = 1;
 	SDL_Event event;
-	createTriangle();
+	createTexture();
 	
 	// GAME LOOP
 	while ( RUNNING ) {
 		glClearColor(0.2f, 0.2f, 0.6f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		
-		drawTriangle();
+		drawTexture();
 		
 		SDL_GL_SwapWindow( WINDOW );
 		
@@ -115,7 +122,10 @@ int main(int argc, char * argv[]) {
 	}
 
 	// DESTROY
-	destroyTriangle();
+	destroyTexture();
+	
+	IMG_Quit();
+	SDL_Log("Destroyed Image Loader");
 	
 	SDL_DestroyWindow ( WINDOW );
 	SDL_Log("Destroyed Window");
@@ -132,52 +142,101 @@ int main(int argc, char * argv[]) {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 /////   TRIANGLE
 
-static Shader4GL_t triangleShader;
-static unsigned int triangleVAO;
-static unsigned int triangleVBO;
+static Shader4GL_t textureShader;
+static unsigned int textureVAO;
+static unsigned int textureVBO;
+static unsigned int textureEBO;
+static unsigned int textureTEX;
 
-static float triangleVertices[] = {
-	// positions         // colors
-	 0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // bottom right
-	-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
-	 0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f   // top 
+static float textureVertices[] = {
+	// positions          // colors           // texture coords
+         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
 };
 
-static void createTriangle () {
-	// load shader
-	triangleShader = Shader4GL_NewFromFile("data/color.vert", "data/color.frag");
-	
-	glGenVertexArrays(1, &triangleVAO);
-	glGenBuffers(1, &triangleVBO);
-	// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-	glBindVertexArray(triangleVAO);
+unsigned int textureIndices[] = { 
+    	0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
+};  
 
-	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(triangleVertices), triangleVertices, GL_STATIC_DRAW);
+static void createTexture () {
+	// load shader
+	textureShader = Shader4GL_NewFromFile("data/tex.vert", "data/tex.frag");
+	
+	glGenVertexArrays(1, &textureVAO);
+	glGenBuffers(1, &textureVBO);
+	glGenBuffers(1, &textureEBO);
+	// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+	glBindVertexArray(textureVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(textureVertices), textureVertices, GL_STATIC_DRAW);
 
 	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	// texture coord attribute
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 	
-	SDL_Log("Created Triangle");
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, textureEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(textureIndices), textureIndices, GL_STATIC_DRAW); 
+	
+	// load and create a texture 
+	// -------------------------
+	glGenTextures(1, &textureTEX);
+	glBindTexture(GL_TEXTURE_2D, textureTEX); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+	// set the texture wrapping parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// set texture filtering parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// load image, create texture and generate mipmaps
+	SDL_Surface * image = IMG_Load("data/wall.png");
+	if (image) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->w, image->h, 0, GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	} else {
+		SDL_Log("Failed to load texture");
+	}
+	SDL_FreeSurface(image);
+	
+	SDL_Log("Created Texture");
 }
 
-static void drawTriangle() {
-	Shader4GL_Use(&triangleShader);
-	glBindVertexArray(triangleVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+static void drawTexture() {
+	Shader4GL_Use(&textureShader);
+	glBindVertexArray(textureVAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-static void destroyTriangle() {
-	glDeleteVertexArrays(1, &triangleVAO);
-    	glDeleteBuffers(1, &triangleVBO);
-    	Shader4GL_Delete(&triangleShader);
+static void destroyTexture() {
+	glDeleteVertexArrays(1, &textureVAO);
+    	glDeleteBuffers(1, &textureVBO);
+    	Shader4GL_Delete(&textureShader);
     	
-    	SDL_Log("Destroyed Triangle");
+    	SDL_Log("Destroyed Texture");
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

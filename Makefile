@@ -4,21 +4,21 @@
 #  © ALL RIGHTS RESERVED            #
 #  ALGODAL™                         #
 #                                   #
-#  2022-06-06 12:55 AM              #
+#  2022-06-07 02:56 AM              #
 #####################################
 
 ARGS=
 INC= -Isrc/APPLICATION/Algorithms/Shader4GL -Isrc/CORE/GLAD
 DEP= -Lbin
 GCC= gcc
-CFLAGS= -Wall -g
+CFLAGS= -Wall -g `sdl2-config --cflags --libs`
 EFLAGS= 
 BFLAGS= 
 FLAGS_SHARED= -fPIC
 FLAGS_STATIC= 
 LFLAGS_SHARED= --shared
 LFLAGS_STATIC= -rcs
-EXTERN_LIB_BIN= -lSDL2 -lGL -ldl
+EXTERN_LIB_BIN= -lSDL2 -lSDL2_image -lGL -ldl
 CLEAN_BIN= $(wildcard bin/*.*)
 CLEAN_EXEC= $(wildcard bin/exec/*.*)
 CLEAN_STATIC= $(wildcard bin/static/*.*)
@@ -33,6 +33,12 @@ build-src: bin/libOpenGLEngine.a
 #########  BIN  #########
 bin/L01_Triangle.out: bin/exec/L01_Triangle.o bin/libOpenGLEngine.a | bin bin/exec bin/shared bin/static
 	$(GCC) $(BFLAGS) $(CFLAGS) $(DEP) bin/exec/L01_Triangle.o -lOpenGLEngine $(EXTERN_LIB_BIN)  -o bin/L01_Triangle.out
+
+bin/L01_Rectangle.out: bin/exec/L01_Rectangle.o bin/libOpenGLEngine.a | bin bin/exec bin/shared bin/static
+	$(GCC) $(BFLAGS) $(CFLAGS) $(DEP) bin/exec/L01_Rectangle.o -lOpenGLEngine $(EXTERN_LIB_BIN)  -o bin/L01_Rectangle.out
+
+bin/L02_Texture.out: bin/exec/L02_Texture.o bin/libOpenGLEngine.a | bin bin/exec bin/shared bin/static
+	$(GCC) $(BFLAGS) $(CFLAGS) $(DEP) bin/exec/L02_Texture.o -lOpenGLEngine $(EXTERN_LIB_BIN)  -o bin/L02_Texture.out
 
 
 
@@ -51,6 +57,12 @@ bin/libOpenGLEngine.so: bin/shared/glad.o bin/shared/Shader4GL.o
 #####  EXEC OBJECT  #####
 bin/exec/L01_Triangle.o: src/APPLICATION/Lessons/L01_Triangle.c src/CORE/GLAD/glad.h src/CORE/GLAD/khrplatform.h src/APPLICATION/Algorithms/Shader4GL/Shader4GL.h | bin bin/exec bin/shared bin/static
 	gcc -c $(EFLAGS) $(CFLAGS) $(INC) src/APPLICATION/Lessons/L01_Triangle.c  -o bin/exec/L01_Triangle.o
+
+bin/exec/L01_Rectangle.o: src/APPLICATION/Lessons/L01_Rectangle.c src/CORE/GLAD/glad.h src/CORE/GLAD/khrplatform.h src/APPLICATION/Algorithms/Shader4GL/Shader4GL.h | bin bin/exec bin/shared bin/static
+	gcc -c $(EFLAGS) $(CFLAGS) $(INC) src/APPLICATION/Lessons/L01_Rectangle.c  -o bin/exec/L01_Rectangle.o
+
+bin/exec/L02_Texture.o: src/APPLICATION/Lessons/L02_Texture.c src/CORE/GLAD/glad.h src/CORE/GLAD/khrplatform.h src/APPLICATION/Algorithms/Shader4GL/Shader4GL.h | bin bin/exec bin/shared bin/static
+	gcc -c $(EFLAGS) $(CFLAGS) $(INC) src/APPLICATION/Lessons/L02_Texture.c  -o bin/exec/L02_Texture.o
 
 
 
@@ -75,6 +87,12 @@ bin/shared/Shader4GL.o: src/APPLICATION/Algorithms/Shader4GL/Shader4GL.c src/COR
 #########  RUN  #########
 L01_Triangle: bin/L01_Triangle.out
 	./bin/L01_Triangle.out $(ARGS)
+
+L01_Rectangle: bin/L01_Rectangle.out
+	./bin/L01_Rectangle.out $(ARGS)
+
+L02_Texture: bin/L02_Texture.out
+	./bin/L02_Texture.out $(ARGS)
 
 
 
